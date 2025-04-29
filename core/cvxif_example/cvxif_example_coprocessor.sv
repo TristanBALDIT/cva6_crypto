@@ -42,6 +42,7 @@ module cvxif_example_coprocessor
   x_issue_req_t  issue_req;
   x_issue_resp_t issue_resp;
   logic issue_valid, issue_ready;
+  logic [5:0] imm;
 
   // Register interface signals
   x_register_t register;
@@ -111,7 +112,8 @@ module cvxif_example_coprocessor
       .opcode_o        (opcode),
       .hartid_o        (issue_hartid),
       .id_o            (issue_id),
-      .rd_o            (issue_rd)
+      .rd_o            (issue_rd),
+      .imm_o           (imm)
   );
 
   logic alu_valid;
@@ -130,6 +132,7 @@ module cvxif_example_coprocessor
       .hartid_i   (issue_hartid),
       .id_i       (issue_id),
       .rd_i       (issue_rd),
+      .imm_i      (imm),
       .hartid_o   (hartid),
       .id_o       (id),
       .result_o   (result),
