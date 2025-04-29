@@ -22,7 +22,9 @@ package cvxif_instr_pkg;
     MSUB_RS3_R4 = 4'b0111,
     NMADD_RS3_R4 = 4'b1000,
     NMSUB_RS3_R4 = 4'b1001,
-    ADD_RS3_R = 4'b1111
+    ADD_RS3_R = 4'b1111,
+    ROR64H = 4'b1010,
+    ROR64L = 4'b1011
   } opcode_t;
 
 
@@ -133,6 +135,22 @@ package cvxif_instr_pkg;
           mask: 32'b00000_11_00000_00000_1_11_00000_1111111,
           resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b1, 1'b1, 1'b1}},
           opcode : NMADD_RS3_R4
+      },
+      '{
+          // Custom ROR64 High word part
+          instr:
+          32'b000000_0_00000_00000_000_00000_0001011,  // custom0 opcode
+          mask: 32'b000000_0_00000_00000_111_00000_1111111,
+          resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b0, 1'b1, 1'b1}},
+          opcode : ROR64H
+      },
+      '{
+          // Custom ROR64 Low word part
+          instr:
+          32'b000000_0_00000_00000_001_00000_0001011,  // custom0 opcode
+          mask: 32'b000000_0_00000_00000_111_00000_1111111,
+          resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b0, 1'b1, 1'b1}},
+          opcode : ROR64H
       }
   };
 
