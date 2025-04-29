@@ -54,9 +54,9 @@ module copro_alu
     logic [5:0] imm
   );
     if (imm < 32) begin
-      result = (hi >> rot) | (lo << (32 - imm)); 
+      result = (hi >> imm) | (lo << (32 - imm)); 
     end else begin
-      result = (lo >> rot - 32 ) | (hi << (32 - imm)); 
+      result = (lo >> imm - 32 ) | (hi << (32 - imm)); 
     end
   endfunction
 
@@ -66,9 +66,9 @@ module copro_alu
     logic [5:0] imm
   );
     if (imm < 32) begin
-      result = (lo >> rot) | (hi << (32 - imm)); 
+      result = (lo >> imm) | (hi << (32 - imm)); 
     end else begin
-      result = (hi >> rot - 32 ) | (lo << (32 - imm)); 
+      result = (hi >> imm - 32 ) | (lo << (32 - imm)); 
     end
     return result; // Partie basse du résultat
   endfunction
