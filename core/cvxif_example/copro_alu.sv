@@ -24,12 +24,14 @@ module copro_alu
     input  hartid_t               hartid_i,
     input  id_t                   id_i,
     input  logic       [     4:0] rd_i,
+    input  logic       [     5:0] imm_i,  //custom immediate value
     output logic       [XLEN-1:0] result_o,
     output hartid_t               hartid_o,
     output id_t                   id_o,
     output logic       [     4:0] rd_o,
     output logic                  valid_o,
     output logic                  we_o
+    
 );
 
   logic [XLEN-1:0] result_n, result_q;
@@ -46,6 +48,32 @@ module copro_alu
   assign rd_o     = rd_q;
   assign we_o     = we_q;
 
+  function automatic logic [31:0] ROR64_HI (
+    logic [31:0] hi,
+    logic [31:0] lo,
+    logic [5:0] imm
+  );
+    logic [63:0] value, rotated;
+    value = {hi, lo}; // Concatène les 64 bits
+  
+    rotated = (value >> imm) | (value << (64 - imm));
+  
+    return rotated[63:32]; // Partie haute du résultat
+  endfunction
+
+  function automatic logic [31:0] ROR64_LO (
+    logic [31:0] hi,
+    logic [31:0] lo,
+    logic [5:0] imm
+  );
+    logic [63:0] value, rotated;
+    value = {hi, lo}; // Concatène les 64 bits
+  
+    rotated = (value >> imm) | (value << (64 - imm));
+  
+    return rotated[31:0]; // Partie haute du résultat
+  endfunction
+  
   always_comb begin
     case (opcode_i)
       cvxif_instr_pkg::NOP: begin
@@ -129,7 +157,7 @@ module copro_alu
         we_n = 1'b1;
       end
       cvxif_instr_pkg::ROR64H: begin
-        result_n = ROR64H(registers_i[0], registers_i[1], opcode)
+        result_n = ROR64_HI(registers_i[0], registers_i[1], imm_i)
         hartid_n = hartid_i;
         id_n = id_i;
         valid_n = 1'b1;
@@ -137,7 +165,7 @@ module copro_alu
         we_n = 1'b1;
       end
       cvxif_instr_pkg::ROR64L: begin
-        result_n = ROR64L(registers_i[0], registers_i[1], opcode)
+        result_n = ROR64_LO(registers_i[0], registers_i[1], imm_i)
         hartid_n = hartid_i;
         id_n = id_i;
         valid_n = 1'b1;
