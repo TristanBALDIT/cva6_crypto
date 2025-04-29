@@ -32,7 +32,8 @@ module instr_decoder #(
     output opcode_t             opcode_o,
     output hartid_t             hartid_o,
     output id_t                 id_o,
-    output logic          [4:0] rd_o
+    output logic          [4:0] rd_o,
+    output logic          [5:0] imm_o
 );
 
   logic [NbInstr-1:0] sel;
@@ -72,6 +73,7 @@ module instr_decoder #(
         id_o     = issue_req_i.id;
         hartid_o = issue_req_i.hartid;
         rd_o     = issue_req_i.instr[11:7];
+        imm_o    = issue_req_i.instr[31:26];
         for (int unsigned j = 0; j < NrRgprPorts; j++) begin
           registers_o[j] = issue_resp_o.register_read[j] ? register_i.rs[j] : '0;
         end
