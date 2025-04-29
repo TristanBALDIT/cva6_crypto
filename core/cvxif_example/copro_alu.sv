@@ -128,6 +128,22 @@ module copro_alu
         rd_n = 5'b01010;
         we_n = 1'b1;
       end
+      cvxif_instr_pkg::ROR64H: begin
+        result_n = ROR64H(registers_i[0], registers_i[1], opcode)
+        hartid_n = hartid_i;
+        id_n = id_i;
+        valid_n = 1'b1;
+        rd_n = rd_i;
+        we_n = 1'b1;
+      end
+      cvxif_instr_pkg::ROR64L: begin
+        result_n = ROR64L(registers_i[0], registers_i[1], opcode)
+        hartid_n = hartid_i;
+        id_n = id_i;
+        valid_n = 1'b1;
+        rd_n = rd_i;
+        we_n = 1'b1;
+      end
       default: begin
         result_n = '0;
         hartid_n = '0;
