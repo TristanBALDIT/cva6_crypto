@@ -72,3 +72,6 @@
 .macro  cus_cadd rs1, rs2
     .insn cr 0x0, 0xf, \rs1, \rs2
 .endm
+
+#define CUS_ROR64H(rs1, rs2, imm, rd) .word 0b##imm##0##rs2##rs1##000##rd##0001011
+#define CUS_ROR64L(rs1, rs2, imm, rd) .word 0b##imm##0##rs2##rs1##001##rd##0001010

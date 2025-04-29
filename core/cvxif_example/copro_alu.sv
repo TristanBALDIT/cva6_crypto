@@ -53,12 +53,11 @@ module copro_alu
     logic [31:0] lo,
     logic [5:0] imm
   );
-    logic [63:0] value, rotated;
-    value = {hi, lo}; // Concatène les 64 bits
-  
-    rotated = (value >> imm) | (value << (64 - imm));
-  
-    return rotated[63:32]; // Partie haute du résultat
+    if (imm < 32) begin
+      result = (hi >> rot) | (lo << (32 - imm)); 
+    end else begin
+      result = (lo >> rot - 32 ) | (hi << (32 - imm)); 
+    end
   endfunction
 
   function automatic logic [31:0] ROR64_LO (
@@ -66,12 +65,12 @@ module copro_alu
     logic [31:0] lo,
     logic [5:0] imm
   );
-    logic [63:0] value, rotated;
-    value = {hi, lo}; // Concatène les 64 bits
-  
-    rotated = (value >> imm) | (value << (64 - imm));
-  
-    return rotated[31:0]; // Partie haute du résultat
+    if (imm < 32) begin
+      result = (lo >> rot) | (hi << (32 - imm)); 
+    end else begin
+      result = (hi >> rot - 32 ) | (lo << (32 - imm)); 
+    end
+    return result; // Partie basse du résultat
   endfunction
   
   always_comb begin
