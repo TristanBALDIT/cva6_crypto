@@ -53,11 +53,13 @@ module copro_alu
     logic [31:0] lo,
     logic [5:0] imm
   );
+    logic [31:0] result;
     if (imm < 32) begin
       result = (hi >> imm) | (lo << (32 - imm)); 
     end else begin
       result = (lo >> imm - 32 ) | (hi << (32 - imm)); 
     end
+    return result; // Partie haute du résultat
   endfunction
 
   function automatic logic [31:0] ROR64_LO (
@@ -65,6 +67,7 @@ module copro_alu
     logic [31:0] lo,
     logic [5:0] imm
   );
+    logic [31:0] result;
     if (imm < 32) begin
       result = (lo >> imm) | (hi << (32 - imm)); 
     end else begin
