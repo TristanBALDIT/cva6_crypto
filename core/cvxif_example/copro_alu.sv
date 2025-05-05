@@ -156,7 +156,7 @@ module copro_alu
         we_n = 1'b1;
       end
       cvxif_instr_pkg::ROR64H: begin
-        result_n = ROR64_HI(registers_i[0], registers_i[1], imm_i)
+        result_n = ROR64_HI(registers_i[0], registers_i[1], imm_i);
         hartid_n = hartid_i;
         id_n = id_i;
         valid_n = 1'b1;
@@ -164,7 +164,7 @@ module copro_alu
         we_n = 1'b1;
       end
       cvxif_instr_pkg::ROR64L: begin
-        result_n = ROR64_LO(registers_i[0], registers_i[1], imm_i)
+        result_n = ROR64_LO(registers_i[0], registers_i[1], imm_i);
         hartid_n = hartid_i;
         id_n = id_i;
         valid_n = 1'b1;
