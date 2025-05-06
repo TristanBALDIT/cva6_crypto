@@ -13,9 +13,9 @@
 # Mappings of custom_* mnemonics to .insn pseudo-op of GAS
 
 
-# CUS_ADD rd, rs1, rs2 -> .insn r CUSTOM_3, 0x1, 0x0, rd, rs1, rs2
+# CUS_ADD* rd, rs1, rs2 -> .insn r CUSTOM_3, 0x1, 0x0, rd, rs1, rs2
 .macro  cus_add rd, rs1, rs2
-    .insn r CUSTOM_3, 0x1, 0x0, \rd, \rs1, \rs2
+    .insn r CUSTOM_1, 0x1, 0x0, \rd, \rs1, \rs2
 .endm
 
 # CUS_NOP -> .insn r CUSTOM_3, 0x0, 0x0, x0, x0, x0
@@ -73,5 +73,8 @@
     .insn cr 0x0, 0xf, \rs1, \rs2
 .endm
 
+#define CUS_ADD(rs1,rs2,rd) .word 0b##0000000##rs2####rs1##001##rd##1111011
+#define CUS_ADD_RS1(rs1,rs2,rd) .word 0b##0000001##rs2####rs1##001##rd##1111011 // only use rs1 : rs1 + rs1 => rd
 #define CUS_ROR64H(rs1, rs2, imm, rd) .word 0b##imm##0##rs2##rs1##000##rd##0001011
-#define CUS_ROR64L(rs1, rs2, imm, rd) .word 0b##imm##0##rs2##rs1##001##rd##0001010
+#define CUS_ROR64L(rs1, rs2, imm, rd) .word 0b##imm##0##rs2##rs1##001##rd##0001011
+#define LOAD_RS(rs,value) li rs, value
