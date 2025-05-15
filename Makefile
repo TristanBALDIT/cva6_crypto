@@ -813,6 +813,22 @@ altera: $(ariane_pkg) $(src) $(fpga_src) $(src_flist)
 
 .PHONY: fpga
 
+.PHONY: cva6_fpga program_cva6_fpga
+
+
+cva6_fpga: $(ariane_pkg) $(util) $(src) $(fpga_src) $(uart_src) $(src_flist) corev_apu/fpga/scripts/add_sources.tcl
+
+	cd corev_apu/fpga && make cva6_fpga BRAM=1 PS7_DDR=0 XILINX_PART=$(XILINX_PART) XILINX_BOARD=$(XILINX_BOARD) CLK_PERIOD_NS=$(CLK_PERIOD_NS) BATCH_MODE=$(BATCH_MODE) FPGA=1
+
+cva6_fpga_ddr: $(ariane_pkg) $(util) $(src) $(fpga_src) $(uart_src) $(src_flist) corev_apu/fpga/scripts/add_sources.tcl
+
+	cd corev_apu/fpga && make cva6_fpga PS7_DDR=1 BRAM=0 XILINX_PART=$(XILINX_PART) XILINX_BOARD=$(XILINX_BOARD) CLK_PERIOD_NS=$(CLK_PERIOD_NS) BATCH_MODE=$(BATCH_MODE) FPGA=1
+
+
+program_cva6_fpga: 
+	@echo "[FPGA] Program FPGA"
+	cd corev_apu/fpga && make program_cva6_fpga BOARD=$(BOARD) XILINX_PART=$(XILINX_PART) XILINX_BOARD=$(XILINX_BOARD) CLK_PERIOD_NS=$(CLK_PERIOD_NS) BATCH_MODE=$(BATCH_MODE)
+
 build-spike:
 	cd tb/riscv-isa-sim && mkdir -p build && cd build && ../configure --prefix=`pwd`/../install --with-fesvr=$(RISCV) --enable-commitlog && make -j8 install
 

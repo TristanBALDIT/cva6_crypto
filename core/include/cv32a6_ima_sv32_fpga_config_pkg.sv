@@ -19,15 +19,15 @@ package cva6_config_pkg;
   localparam CVA6ConfigF8En = 0;
   localparam CVA6ConfigFVecEn = 0;
 
-  localparam CVA6ConfigCvxifEn = 0;
-  localparam CVA6ConfigCExtEn = 0;
-  localparam CVA6ConfigZcbExtEn = 0;
+  localparam CVA6ConfigCvxifEn = 1;
+  localparam CVA6ConfigCExtEn = 1;
+  localparam CVA6ConfigZcbExtEn = 1;
   localparam CVA6ConfigZcmpExtEn = 0;
-  localparam CVA6ConfigAExtEn = 1;
+  localparam CVA6ConfigAExtEn = 0;
   localparam CVA6ConfigHExtEn = 0;  // always disabled
-  localparam CVA6ConfigBExtEn = 0;
+  localparam CVA6ConfigBExtEn = 1;
   localparam CVA6ConfigVExtEn = 0;
-  localparam CVA6ConfigRVZiCond = 0;
+  localparam CVA6ConfigRVZiCond = 1;
 
   localparam CVA6ConfigAxiIdWidth = 4;
   localparam CVA6ConfigAxiAddrWidth = 64;
@@ -61,9 +61,9 @@ package cva6_config_pkg;
 
   localparam CVA6ConfigTvalEn = 1;
 
-  localparam CVA6ConfigNrPMPEntries = 0;
+  localparam CVA6ConfigNrPMPEntries = 8;
 
-  localparam CVA6ConfigPerfCounterEn = 0;
+  localparam CVA6ConfigPerfCounterEn = 1;
 
   localparam config_pkg::cache_type_t CVA6ConfigDcacheType = config_pkg::WT;
 
@@ -101,7 +101,7 @@ package cva6_config_pkg;
       RVZCMP: bit'(CVA6ConfigZcmpExtEn),
       XFVec: bit'(CVA6ConfigFVecEn),
       CvxifEn: bit'(CVA6ConfigCvxifEn),
-      CoproType: config_pkg::COPRO_NONE,
+      CoproType: config_pkg::COPRO_EXAMPLE,
       RVZiCond: bit'(CVA6ConfigRVZiCond),
       RVZicntr: bit'(1),
       RVZihpm: bit'(1),
