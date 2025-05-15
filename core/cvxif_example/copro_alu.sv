@@ -57,7 +57,7 @@ module copro_alu
     if (imm < 32) begin
       result = (hi >> imm) | (lo << (32 - imm)); 
     end else begin
-      result = (lo >> imm - 32 ) | (hi << (32 - imm)); 
+      result = (lo >> imm - 32 ) | (hi << (64 - imm)); 
     end
     return result; // Partie haute du résultat
   endfunction
@@ -71,7 +71,7 @@ module copro_alu
     if (imm < 32) begin
       result = (lo >> imm) | (hi << (32 - imm)); 
     end else begin
-      result = (hi >> imm - 32 ) | (lo << (32 - imm)); 
+      result = (hi >> imm - 32 ) | (lo << (64 - imm)); 
     end
     return result; // Partie basse du résultat
   endfunction
