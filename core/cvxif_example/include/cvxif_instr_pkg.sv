@@ -54,7 +54,7 @@ package cvxif_instr_pkg;
   } copro_compressed_resp_t;
 
   // 4 Possible RISCV instructions for Coprocessor
-  parameter int unsigned NbInstr = 12;
+  parameter int unsigned NbInstr = 13;
   parameter copro_issue_resp_t CoproInstr[NbInstr] = '{
       '{
           // Custom Nop
@@ -151,7 +151,15 @@ package cvxif_instr_pkg;
           mask: 32'b000000_0_00000_00000_111_00000_1111111,
           resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b0, 1'b1, 1'b1}},
           opcode : ROR64H
-      }
+      },
+    '{
+          // Custom OP for ASCON p-function
+          instr:
+          32'b00000_00_00000_00000_001_00000_0001011,  // custom0 opcode
+          mask: 32'b00000_11_00000_00000_111_00000_1111111,
+          resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b1, 1'b1, 1'b1}},
+          opcode : OP_ASCON
+      }   
   };
 
   parameter int unsigned NbCompInstr = 2;
