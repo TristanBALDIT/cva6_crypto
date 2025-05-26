@@ -24,7 +24,8 @@ package cvxif_instr_pkg;
     NMSUB_RS3_R4 = 4'b1001,
     ADD_RS3_R = 4'b1111,
     ROR64H = 4'b1010,
-    ROR64L = 4'b1011
+    ROR64L = 4'b1011,
+    OP_ASCON = 4'b1100
   } opcode_t;
 
 

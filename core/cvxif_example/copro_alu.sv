@@ -175,7 +175,7 @@ module copro_alu
         we_n = 1'b1;
       end
       cvxif_instr_pkg::OP_ASCON: begin
-        result_n = NrRgprPorts == 3 ? register_i[0] ^ (~ register_i[1] & register_i[2]) : 32'b0; 
+        result_n = NrRgprPorts == 3 ? registers_i[0] ^ (~ registers_i[1] & registers_i[2]) : 32'b0; 
         hartid_n = hartid_i;
         id_n = id_i;
         valid_n = 1'b1;
