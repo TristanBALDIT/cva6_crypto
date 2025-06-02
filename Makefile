@@ -1,6 +1,27 @@
+# Copyright (c) 2020 Thales.
+# 
+# Copyright and related rights are licensed under the Apache
+# License, Version 2.0 (the "License"); you may not use this file except in
+# compliance with the License.  You may obtain a copy of the License at
+# https://www.apache.org/licenses/LICENSE-2.0. Unless required by applicable law
+# or agreed to in writing, software, hardware and materials distributed under
+# this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations under the License.
+#
 # Author: Florian Zaruba, ETH Zurich
 # Date: 03/19/2017
+#
+# Additional contributions by:
+#         Sebastien Jacq - sjthales on github.com
+#
 # Description: Makefile for linting and testing Ariane.
+#
+# =========================================================================== #
+# Revisions  :
+# Date        Version  Author       Description
+# 2020-10-06  0.1      S.Jacq       modification for CVA6 softcore
+# =========================================================================== #
 
 # questa library
 library        ?= work
@@ -15,7 +36,7 @@ top_level      ?= ariane_tb
 # Top level path
 top_level_path ?= corev_apu/tb/$(top_level).sv
 # Maximum amount of cycles for a successful simulation run
-max_cycles     ?= 10000000
+max_cycles     ?= 1000000000
 # Test case to run
 test_case      ?= core_test
 # QuestaSim Version
@@ -31,19 +52,23 @@ verilator             ?= verilator
 # traget option
 target-options ?=
 # additional defines
-defines        ?=
+defines        ?= WT_DCACHE
 # test name for torture runs (binary name)
 test-location  ?= output/test
 # set to either nothing or -log
 torture-logs   :=
 # custom elf bin to run with sim or sim-verilator
-elf_file        ?= tmp/riscv-tests/build/benchmarks/dhrystone.riscv
-# board name for bitstream generation. Currently supported: kc705, genesys2, nexys_video
-BOARD          ?= genesys2
-ALTERA_BOARD		 ?= DK-DEV-AGF014E3ES
-ALTERA_FAMILY	 ?= "AGILEX"
-ALTERA_PART		 ?= AGFB014R24B2E2V
-PLATFORM			 = "PLAT_XILINX"
+elf_file       ?= sw/app/benchmarks/coremark.riscv
+# Application to simulate
+APP            ?= mnist
+
+# board name for bitstream generation. Currently supported: kc705, genesys2, nexys_video and zybo-z7-20
+BOARD          	?= zybo-z7-20
+ALTERA_BOARD	?= DK-DEV-AGF014E3ES
+ALTERA_FAMILY	?= "AGILEX"
+ALTERA_PART		?= AGFB014R24B2E2V
+PLATFORM	    = "PLAT_XILINX"
+
 # root path
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 root-dir := $(dir $(mkfile_path))
@@ -53,6 +78,9 @@ $(warning must set CVA6_REPO_DIR to point at the root of CVA6 sources -- doing i
 export CVA6_REPO_DIR = $(abspath $(root-dir))
 endif
 
+# software application path
+APP_PATH := $(root-dir)/sw/app
+
 support_verilator_4 := $(shell ($(verilator) --version | grep '4\.') > /dev/null 2>&1 ; echo $$?)
 ifeq ($(support_verilator_4), 0)
 	verilator_threads := 1
@@ -60,9 +88,11 @@ endif
 # Location of Verilator headers and optional source files
 VL_INC_DIR := $(VERILATOR_INSTALL_DIR)/share/verilator/include
 
-ifndef RISCV
-$(error RISCV not set - please point your RISCV variable to your RISCV installation)
-endif
+#Path to questasim binaries
+QUESTA_BIN := $(realpath $(dir $(shell which vsim)))
+
+#Path of xilinx library for Questasim
+LIB_XILINX_QUESTA_PATH := $(root-dir)fpga/lib_xilinx_questa
 
 # Spike tandem mode: default to environment setting (DISABLED if envariable SPIKE_TANDEM is not set).
 spike-tandem ?= $(SPIKE_TANDEM)
@@ -86,6 +116,11 @@ else ifeq ($(BOARD), nexys_video)
 	XILINX_PART              := xc7a200tsbg484-1
 	XILINX_BOARD             := digilentinc.com:nexys_video:part0:1.1
 	CLK_PERIOD_NS            := 40
+else ifeq ($(BOARD), zybo-z7-20)
+	XILINX_PART              := xc7z020clg400-1
+	XILINX_BOARD             := digilentinc.com:zybo-z7-20:part0:1.2
+	CLK_PERIOD_NS            := 25
+	BATCH_MODE ?= 1
 else
 $(error Unknown board - please specify a supported FPGA board)
 endif
@@ -101,7 +136,7 @@ endif
 # target takes one of the following cva6 hardware configuration:
 # cv64a6_imafdc_sv39, cv32a6_imac_sv0, cv32a6_imac_sv32, cv32a6_imafc_sv32, cv32a6_ima_sv32_fpga
 # Changing the default target to cv32a60x for Step1 verification
-target     ?= cv64a6_imafdc_sv39
+target     ?= cv32a6_ima_sv32_fpga
 ifeq ($(target), cv64a6_imafdc_sv39)
 	XLEN ?= 64
 else
