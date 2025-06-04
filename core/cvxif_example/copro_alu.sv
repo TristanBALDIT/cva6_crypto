@@ -24,7 +24,8 @@ module copro_alu
     input  hartid_t               hartid_i,
     input  id_t                   id_i,
     input  logic       [     4:0] rd_i,
-    input  logic       [     5:0] imm_i,  //custom immediate value
+    input  logic       [     5:0] imm_i,          //custom immediate value
+    input  logic       [     1:0] f2_i,           //custom function code
     output logic       [XLEN-1:0] result_o,
     output hartid_t               hartid_o,
     output id_t                   id_o,
@@ -75,6 +76,24 @@ module copro_alu
     end
     return result; // Partie basse du résultat
   endfunction
+
+  function automatic logic [31:0] F_CHACHA (
+    logic [31:0] r1,
+    logic [31:0] r2,
+    logic [31:0] r3,
+    logic [1:0] f2
+  );
+    logic [31:0] result;
+    result = (r1 & r2) ^ r3;
+    case(f2)
+      2'b00: result = ((result << 16) | (result >> 16));
+      2'b01: result = ((result << 12) | (result >> 20));
+      2'b10: result = ((result << 8) | (result >> 24));
+      2'b11: result = ((result << 7) | (result >> 25));
+      default: result = '0; // Default case
+    endcase
+    return result; // Résultat
+  endfunction
   
   always_comb begin
     case (opcode_i)
@@ -85,78 +104,6 @@ module copro_alu
         valid_n  = 1'b1;
         rd_n     = '0;
         we_n     = '0;
-      end
-      cvxif_instr_pkg::ADD: begin
-        result_n = registers_i[1] + registers_i[0];
-        hartid_n = hartid_i;
-        id_n     = id_i;
-        valid_n  = 1'b1;
-        rd_n     = rd_i;
-        we_n     = 1'b1;
-      end
-      cvxif_instr_pkg::DOUBLE_RS1: begin
-        result_n = registers_i[0] + registers_i[0];
-        hartid_n = hartid_i;
-        id_n     = id_i;
-        valid_n  = 1'b1;
-        rd_n     = rd_i;
-        we_n     = 1'b1;
-      end
-      cvxif_instr_pkg::DOUBLE_RS2: begin
-        result_n = registers_i[1] + registers_i[1];
-        hartid_n = hartid_i;
-        id_n     = id_i;
-        valid_n  = 1'b1;
-        rd_n     = rd_i;
-        we_n     = 1'b1;
-      end
-      cvxif_instr_pkg::ADD_MULTI: begin
-        result_n = registers_i[1] + registers_i[0];
-        hartid_n = hartid_i;
-        id_n     = id_i;
-        valid_n  = 1'b1;
-        rd_n     = rd_i;
-        we_n     = 1'b1;
-      end
-      cvxif_instr_pkg::MADD_RS3_R4: begin
-        result_n = NrRgprPorts == 3 ? (registers_i[0] + registers_i[1] + registers_i[2]) : (registers_i[0] + registers_i[1]);
-        hartid_n = hartid_i;
-        id_n = id_i;
-        valid_n = 1'b1;
-        rd_n = rd_i;
-        we_n = 1'b1;
-      end
-      cvxif_instr_pkg::MSUB_RS3_R4: begin
-        result_n = NrRgprPorts == 3 ? (registers_i[0] - registers_i[1] - registers_i[2]) : (registers_i[0] - registers_i[1]);
-        hartid_n = hartid_i;
-        id_n = id_i;
-        valid_n = 1'b1;
-        rd_n = rd_i;
-        we_n = 1'b1;
-      end
-      cvxif_instr_pkg::NMADD_RS3_R4: begin
-        result_n = NrRgprPorts == 3 ? ~(registers_i[0] + registers_i[1] + registers_i[2]) : ~(registers_i[0] + registers_i[1]);
-        hartid_n = hartid_i;
-        id_n = id_i;
-        valid_n = 1'b1;
-        rd_n = rd_i;
-        we_n = 1'b1;
-      end
-      cvxif_instr_pkg::NMSUB_RS3_R4: begin
-        result_n = NrRgprPorts == 3 ? ~(registers_i[0] - registers_i[1] - registers_i[2]) : ~(registers_i[0] - registers_i[1]);
-        hartid_n = hartid_i;
-        id_n = id_i;
-        valid_n = 1'b1;
-        rd_n = rd_i;
-        we_n = 1'b1;
-      end
-      cvxif_instr_pkg::ADD_RS3_R: begin
-        result_n = NrRgprPorts == 3 ? registers_i[2] + registers_i[1] + registers_i[0] : registers_i[1] + registers_i[0];
-        hartid_n = hartid_i;
-        id_n = id_i;
-        valid_n = 1'b1;
-        rd_n = 5'b01010;
-        we_n = 1'b1;
       end
       cvxif_instr_pkg::ROR64H: begin
         result_n = ROR64_HI(registers_i[0], registers_i[1], imm_i);
@@ -176,6 +123,14 @@ module copro_alu
       end
       cvxif_instr_pkg::OP_ASCON: begin
         result_n = NrRgprPorts == 3 ? registers_i[0] ^ (~ registers_i[1] & registers_i[2]) : 32'b0; 
+        hartid_n = hartid_i;
+        id_n = id_i;
+        valid_n = 1'b1;
+        rd_n = rd_i;
+        we_n = 1'b1;
+      end
+      cvxif_instr_pkg::OP_CHACHA: begin
+        result_n = NrRgprPorts == 3 ? F_CHACHA(registers_i[0], registers_i[1], registers_i[2], f2_i)   : 32'b0; 
         hartid_n = hartid_i;
         id_n = id_i;
         valid_n = 1'b1;
