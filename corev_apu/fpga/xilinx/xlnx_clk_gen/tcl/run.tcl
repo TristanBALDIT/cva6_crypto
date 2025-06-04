@@ -42,7 +42,7 @@ if {$::env(BOARD) eq "nexys_video"} {
                         CONFIG.CLKOUT2_USED {true} \
                         CONFIG.CLKOUT3_USED {true} \
                         CONFIG.CLKOUT4_USED {true} \
-                        CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {40} \
+                        CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {50} \
                         CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {125} \
                         CONFIG.CLKOUT3_REQUESTED_OUT_FREQ {125} \
                         CONFIG.CLKOUT3_REQUESTED_PHASE {90.000} \
