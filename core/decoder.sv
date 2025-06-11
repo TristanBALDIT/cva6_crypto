@@ -1467,7 +1467,8 @@ module decoder
         imm_select             = instr.rtype.opcode == riscv::OpcodeMadd ||
                                  instr.rtype.opcode == riscv::OpcodeMsub ||
                                  instr.rtype.opcode == riscv::OpcodeNmadd ||
-                                 instr.rtype.opcode == riscv::OpcodeNmsub ? RS3 : MUX_RD_RS3;
+                                 instr.rtype.opcode == riscv::OpcodeNmsub ||
+                                 instr.rtype.opcode == riscv::OpcodeCustom1 ? RS3 : MUX_RD_RS3;
       end
     end
 

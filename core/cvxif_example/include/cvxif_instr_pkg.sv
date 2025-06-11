@@ -76,7 +76,7 @@ package cvxif_instr_pkg;
     '{
           // Custom OP for ASCON p-function
           instr:
-          32'b00000_00_00000_00000_010_00000_0001011,  // custom0 opcode
+          32'b00000_00_00000_00000_010_00000_0101011,  // custom1 opcode (r4 type insn)
           mask: 32'b00000_11_00000_00000_111_00000_1111111,
           resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b1, 1'b1, 1'b1}},
           opcode : OP_ASCON
@@ -84,7 +84,7 @@ package cvxif_instr_pkg;
     '{
           // Custom OP for CHACAHA QR-function
           instr:
-          32'b00000_00_00000_00000_011_00000_0001011,  // custom0 opcode
+          32'b00000_00_00000_00000_011_00000_0101011,  // custom1 opcode (r4 type insn)
           mask: 32'b00000_00_00000_00000_111_00000_1111111,
           resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b1, 1'b1, 1'b1}},
           opcode : OP_CHACHA

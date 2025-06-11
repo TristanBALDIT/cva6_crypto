@@ -476,7 +476,7 @@ module issue_read_operands
         .idx_o(idx_hzd_rs3[i]),
         .valid_o(rs3_raw_check[i])
     );
-    assign rs3_has_raw[i] = rs3_raw_check[i] && rs3_fpr[i];
+    assign rs3_has_raw[i] = rs3_raw_check[i] && (rs3_fpr[i] || (issue_instr_i[i].op == OFFLOAD && OPERANDS_PER_INSTR == 3));
   end
 
   // ----------------------------------
@@ -548,7 +548,7 @@ module issue_read_operands
         end
       end
 
-      if (rs3_has_raw[i] && rs3_fpr[i]) begin
+      if (rs3_has_raw[i] && (rs3_fpr[i] || (issue_instr_i[i].op == OFFLOAD && OPERANDS_PER_INSTR == 3))) begin
         if (rs3_valid[i]) begin
           forward_rs3[i] = 1'b1;
         end else begin  // the operand is not available -> stall
