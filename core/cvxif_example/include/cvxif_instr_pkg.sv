@@ -71,7 +71,7 @@ package cvxif_instr_pkg;
           32'b000000_0_00000_00000_001_00000_0001011,  // custom0 opcode
           mask: 32'b000000_0_00000_00000_111_00000_1111111,
           resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b0, 1'b1, 1'b1}},
-          opcode : ROR64H
+          opcode : ROR64L
       },
     '{
           // Custom OP for ASCON p-function
