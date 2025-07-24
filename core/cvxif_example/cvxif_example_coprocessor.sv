@@ -43,7 +43,7 @@ module cvxif_example_coprocessor
   x_issue_resp_t issue_resp;
   logic issue_valid, issue_ready;
   // Immediate and function code signals
-  logic [5:0] imm;
+  logic [6:0] imm;
   logic [1:0] f2;
 
   // Register interface signals

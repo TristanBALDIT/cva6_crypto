@@ -24,7 +24,7 @@ module copro_alu
     input  hartid_t               hartid_i,
     input  id_t                   id_i,
     input  logic       [     4:0] rd_i,
-    input  logic       [     5:0] imm_i,          //custom immediate value
+    input  logic       [     6:0] imm_i,          //custom immediate value
     input  logic       [     1:0] f2_i,           //custom function code
     output logic       [XLEN-1:0] result_o,
     output hartid_t               hartid_o,
@@ -60,7 +60,7 @@ module copro_alu
     end else begin
       result = (lo >> imm - 32 ) | (hi << (64 - imm)); 
     end
-    return result; // Partie haute du résultat
+    return result; // higher part result
   endfunction
 
   function automatic logic [31:0] ROR64_LO (
@@ -74,7 +74,7 @@ module copro_alu
     end else begin
       result = (hi >> imm - 32 ) | (lo << (64 - imm)); 
     end
-    return result; // Partie basse du résultat
+    return result; // lower part result
   endfunction
 
   function automatic logic [31:0] F_CHACHA (
@@ -94,7 +94,41 @@ module copro_alu
     endcase
     return result; // Résultat
   endfunction
+
+  function automatic logic [31:0] F_MULTI_ROR64H (
+    logic [31:0] hi,
+    logic [31:0] lo,
+    logic [6:0] imm
+  );
+    logic [31:0] result;
+    case(imm)
+      7'b0000000: result = hi ^ ROR64_HI(hi, lo, 19) ^ ROR64_HI(hi, lo, 28); // ROR64H with imm = 19 and 28
+      7'b0000001: result = hi ^ ROR64_HI(hi, lo, 61) ^ ROR64_HI(hi, lo, 39); // ROR64H with imm = 61 and 39
+      7'b0000010: result = hi ^ ROR64_HI(hi, lo, 1) ^ ROR64_HI(hi, lo, 6); // ROR64H with imm = 1 and 6
+      7'b0000011: result = hi ^ ROR64_HI(hi, lo, 10) ^ ROR64_HI(hi, lo, 17); // ROR64H with imm = 10 and 17
+      7'b0000100: result = hi ^ ROR64_HI(hi, lo, 7) ^ ROR64_HI(hi, lo, 41); // ROR64H with imm = 7 and 41
+      default: result = '0; // Default case
+    endcase
+    return result; // higher part result
+  endfunction  
   
+  function automatic logic [31:0] F_MULTI_ROR64L (
+    logic [31:0] hi,
+    logic [31:0] lo,
+    logic [6:0] imm
+  );
+    logic [31:0] result;
+    case(imm)
+      7'b0000000: result = lo ^ ROR64_LO(hi, lo, 19) ^ ROR64_LO(hi, lo, 28); // ROR64H with imm = 19 and 28
+      7'b0000001: result = lo ^ ROR64_LO(hi, lo, 61) ^ ROR64_LO(hi, lo, 39); // ROR64H with imm = 61 and 39
+      7'b0000010: result = lo ^ ROR64_LO(hi, lo, 1) ^ ROR64_LO(hi, lo, 6); // ROR64H with imm = 1 and 6
+      7'b0000011: result = lo ^ ROR64_LO(hi, lo, 10) ^ ROR64_LO(hi, lo, 17); // ROR64H with imm = 10 and 17
+      7'b0000100: result = lo ^ ROR64_LO(hi, lo, 7) ^ ROR64_LO(hi, lo, 41); // ROR64H with imm = 7 and 41
+      default: result = '0; // Default case
+    endcase
+    return result; // lower part result
+  endfunction 
+
   always_comb begin
     case (opcode_i)
       cvxif_instr_pkg::NOP: begin
@@ -106,7 +140,7 @@ module copro_alu
         we_n     = '0;
       end
       cvxif_instr_pkg::ROR64H: begin
-        result_n = ROR64_HI(registers_i[0], registers_i[1], imm_i);
+        result_n = ROR64_HI(registers_i[0], registers_i[1], imm_i[6:1]);
         hartid_n = hartid_i;
         id_n = id_i;
         valid_n = 1'b1;
@@ -114,7 +148,7 @@ module copro_alu
         we_n = 1'b1;
       end
       cvxif_instr_pkg::ROR64L: begin
-        result_n = ROR64_LO(registers_i[0], registers_i[1], imm_i);
+        result_n = ROR64_LO(registers_i[0], registers_i[1], imm_i[6:1]);
         hartid_n = hartid_i;
         id_n = id_i;
         valid_n = 1'b1;
@@ -131,6 +165,22 @@ module copro_alu
       end
       cvxif_instr_pkg::OP_CHACHA: begin
         result_n = NrRgprPorts == 3 ? F_CHACHA(registers_i[0], registers_i[1], registers_i[2], f2_i)   : 32'b0; 
+        hartid_n = hartid_i;
+        id_n = id_i;
+        valid_n = 1'b1;
+        rd_n = rd_i;
+        we_n = 1'b1;
+      end
+      cvxif_instr_pkg::MULTI_ROR64H: begin
+        result_n = F_MULTI_ROR64H(registers_i[0], registers_i[1], imm_i); 
+        hartid_n = hartid_i;
+        id_n = id_i;
+        valid_n = 1'b1;
+        rd_n = rd_i;
+        we_n = 1'b1;
+      end
+      cvxif_instr_pkg::MULTI_ROR64L: begin
+        result_n = F_MULTI_ROR64L(registers_i[0], registers_i[1], imm_i); 
         hartid_n = hartid_i;
         id_n = id_i;
         valid_n = 1'b1;

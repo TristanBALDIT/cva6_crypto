@@ -17,7 +17,9 @@ package cvxif_instr_pkg;
     ROR64H = 4'b0010,
     ROR64L = 4'b0011,
     OP_ASCON = 4'b0100,
-    OP_CHACHA = 4'b0101
+    OP_CHACHA = 4'b0101,
+    MULTI_ROR64H = 4'b0110,
+    MULTI_ROR64L = 4'b0111
   } opcode_t;
 
 
@@ -46,8 +48,8 @@ package cvxif_instr_pkg;
     compressed_resp_t resp;
   } copro_compressed_resp_t;
 
-  // 4 Possible RISCV instructions for Coprocessor
-  parameter int unsigned NbInstr = 5;
+  // 6 Possible RISCV instructions for Coprocessor
+  parameter int unsigned NbInstr = 7;
   parameter copro_issue_resp_t CoproInstr[NbInstr] = '{
       '{
           // Custom Nop
@@ -76,7 +78,7 @@ package cvxif_instr_pkg;
     '{
           // Custom OP for ASCON p-function
           instr:
-          32'b00000_00_00000_00000_010_00000_0101011,  // custom1 opcode (r4 type insn)
+          32'b00000_00_00000_00000_010_00000_0001011,  // custom0 opcode 
           mask: 32'b00000_11_00000_00000_111_00000_1111111,
           resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b1, 1'b1, 1'b1}},
           opcode : OP_ASCON
@@ -84,11 +86,27 @@ package cvxif_instr_pkg;
     '{
           // Custom OP for CHACAHA QR-function
           instr:
-          32'b00000_00_00000_00000_011_00000_0101011,  // custom1 opcode (r4 type insn)
+          32'b00000_00_00000_00000_011_00000_0001011,  // custom0 opcode 
           mask: 32'b00000_00_00000_00000_111_00000_1111111,
           resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b1, 1'b1, 1'b1}},
           opcode : OP_CHACHA
-      }      
+      },
+      '{
+          // custom multi-ROR64 high word part for ASCON
+          instr:
+          32'b000000_0_00000_00000_100_00000_0001011,  // custom0 opcode 
+          mask: 32'b000000_0_00000_00000_111_00000_1111111,
+          resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b0, 1'b1, 1'b1}},
+          opcode : MULTI_ROR64H
+      },
+      '{
+          // custom multi-ROR64 low word part for ASCON
+          instr:
+          32'b000000_0_00000_00000_101_00000_0001011,  // custom0 opcode 
+          mask: 32'b000000_0_00000_00000_111_00000_1111111,
+          resp : '{accept : 1'b1, writeback : 1'b1, register_read : {1'b0, 1'b1, 1'b1}},
+          opcode : MULTI_ROR64L
+      }                
   };
 
   parameter int unsigned NbCompInstr = 2;

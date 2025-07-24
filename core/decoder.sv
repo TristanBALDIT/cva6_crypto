@@ -1464,11 +1464,11 @@ module decoder
         instruction_o.rs2 = instr.r4type.rs2;
         instruction_o.rd = instr.r4type.rd;
         instruction_o.op = ariane_pkg::OFFLOAD;
-        imm_select             = instr.rtype.opcode == riscv::OpcodeMadd ||
+        imm_select             = instr.instr[6:0] == riscv::OpcodeCustom0 ||
+                                 instr.rtype.opcode == riscv::OpcodeMadd ||
                                  instr.rtype.opcode == riscv::OpcodeMsub ||
                                  instr.rtype.opcode == riscv::OpcodeNmadd ||
-                                 instr.rtype.opcode == riscv::OpcodeNmsub ||
-                                 instr.rtype.opcode == riscv::OpcodeCustom1 ? RS3 : MUX_RD_RS3;
+                                 instr.rtype.opcode == riscv::OpcodeNmsub ? RS3 : MUX_RD_RS3;
       end
     end
 
